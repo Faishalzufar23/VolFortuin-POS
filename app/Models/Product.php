@@ -19,4 +19,17 @@ class Product extends Model
     {
         return $this->hasMany(SaleItem::class);
     }
+
+    public function productIngredients()
+    {
+        return $this->hasMany(ProductIngredient::class);
+        return $this->hasMany(\App\Models\ProductIngredient::class);
+    }
+
+
+    public function ingredients()
+    {
+        return $this->belongsToMany(Ingredient::class, 'product_ingredients')
+            ->withPivot('quantity', 'unit');
+    }
 }
