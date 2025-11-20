@@ -13,6 +13,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables\Columns\BadgeColumn;
 
 
 
@@ -43,6 +44,29 @@ class SaleResource extends Resource
                     ->money('IDR')
                     ->sortable(),
 
+                TextColumn::make('paid_amount')
+                    ->label('Dibayar')
+                    ->money('IDR')
+                    ->sortable(),
+
+                TextColumn::make('change_amount')
+                    ->label('Kembalian')
+                    ->money('IDR')
+                    ->sortable(),
+
+                TextColumn::make('payment_method')
+                    ->label('Metode')
+                    ->badge()
+                    ->colors([
+                        'success' => 'cash',
+                        'info' => 'qris',
+                    ])
+                    ->formatStateUsing(
+                        fn($state) =>
+                        strtoupper($state)
+                    )
+                    ->sortable(),
+
                 TextColumn::make('created_at')
                     ->label('Tanggal')
                     ->dateTime('Y-m-d H:i:s')
@@ -51,13 +75,17 @@ class SaleResource extends Resource
                 // MENU COLUMN YANG BENAR
                 TextColumn::make('menu')
                     ->label('Menu')
-                    ->state(function ($record) {
-                        return $record->items
+                    ->state(
+                        fn($record) =>
+                        $record->items
                             ->map(fn($i) => "{$i->name} ({$i->quantity})")
-                            ->implode(', ');
-                    })
+                            ->toArray()
+                    )
                     ->wrap(),
             ])
+
+
+
             ->filters([
                 //
             ])

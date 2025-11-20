@@ -34,12 +34,8 @@ class ProductResource extends Resource
         return ProductsTable::configure($table);
     }
 
-    public static function getRelations(): array
-    {
-        return [
-            ProductIngredientsRelationManager::class,
-        ];
-    }
+
+
     // public static function canViewAny(): bool
     // {
     //     return (Auth::user()?->role ?? '') === 'admin';
@@ -59,6 +55,13 @@ class ProductResource extends Resource
     // {
     //     return (Auth::user()?->role ?? '') === 'admin';
     // }
+
+    public static function getRelations(): array
+    {
+        return [
+            ProductIngredientsRelationManager::class,
+        ];
+    }
 
     public static function getPages(): array
     {

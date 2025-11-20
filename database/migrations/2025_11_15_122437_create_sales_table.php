@@ -21,6 +21,9 @@ return new class extends Migration
             $table->decimal('discount', 12, 2)->default(0);
             $table->decimal('total', 12, 2)->default(0);
             $table->string('payment_status')->default('paid'); // paid / pending / refunded
+            $table->string('payment_method')->nullable();
+            $table->integer('paid_amount')->nullable();
+            $table->integer('change_amount')->nullable();
             $table->timestamps();
         });
     }

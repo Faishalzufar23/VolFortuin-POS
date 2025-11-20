@@ -111,6 +111,13 @@ class Cashier extends Component
                 'discount'       => $this->discount,
                 'total'          => $this->total,
                 'payment_status' => 'paid',
+                'payment_method' => $this->paymentMethod,
+                'paid_amount'    => $this->paymentMethod === 'cash'
+                    ? $this->cashAmount
+                    : $this->total,
+                'change_amount'  => $this->paymentMethod === 'cash'
+                    ? ($this->cashAmount - $this->total)
+                    : 0,
             ]);
 
             foreach ($this->cart as $item) {
@@ -118,11 +125,11 @@ class Cashier extends Component
                 // 1. Simpan sale item (snapshot name)
                 $saleItem = SaleItem::create([
                     'sale_id'   => $sale->id,
-                    'product_id'=> $item['id'],
+                    'product_id' => $item['id'],
                     'name'      => $item['name'],
                     'quantity'  => $item['quantity'],
                     'price'     => $item['price'],
-                    'line_total'=> $item['quantity'] * $item['price'],
+                    'line_total' => $item['quantity'] * $item['price'],
                 ]);
 
                 // 2. Ambil resep produk
@@ -169,7 +176,6 @@ class Cashier extends Component
 
             $this->dispatch('notify', message: 'Transaksi berhasil!');
             $this->loadProducts();
-
         } catch (\Throwable $e) {
             DB::rollBack();
 
@@ -180,6 +186,73 @@ class Cashier extends Component
             ]);
         }
     }
+
+    public $showPaymentModal = false;
+    public $paymentMethod = 'cash';
+    public $cashAmount;
+    public $showSuccessMessage = false;
+    public $stepPayment = 1; // 1 = pilih metode, 2 = input cash, 3 = QRIS popup
+    public $changeAmount = 0;
+    public $showSuccessModal = false;
+    public $successMessage = '';
+    public $successChange = 0;
+
+
+    public function selectPaymentMethod($method)
+    {
+        $this->paymentMethod = $method;
+
+        if ($method === 'cash') {
+            $this->stepPayment = 2;
+        } else {
+            $this->stepPayment = 3;
+        }
+    }
+
+    public function calculateChange()
+    {
+        $this->changeAmount = $this->cashAmount - $this->total;
+    }
+
+    public function confirmCashPayment()
+    {
+        if ($this->cashAmount < $this->total) {
+            $this->dispatch('notify', type: 'error', message: 'Uang kurang!');
+            return;
+        }
+
+        // 🔥 Proses transaksi dulu
+        $this->checkout();
+
+        // 🔥 Baru tampilkan popup sukses
+        $this->successMessage = 'Pembayaran Cash Berhasil!';
+        $this->successChange = $this->cashAmount - $this->total;
+        $this->showSuccessModal = true;
+
+        // 🔥 Reset modal payment
+        $this->showPaymentModal = false;
+        $this->stepPayment = 1;
+    }
+
+    public function confirmQrisPayment()
+    {
+        $this->checkout();
+
+        $this->successMessage = 'Pembayaran QRIS Berhasil!';
+        $this->successChange = null;
+        $this->showSuccessModal = true;
+
+        $this->showPaymentModal = false;
+        $this->stepPayment = 1;
+    }
+
+
+    public function printReceipt()
+    {
+        $this->dispatch('notify', message: 'Fitur cetak struk coming soon!');
+        $this->showSuccessModal = false;
+    }
+
 
     public function render()
     {

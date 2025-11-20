@@ -15,18 +15,28 @@
             width: 100% ;
             max-width: 100% ;
             padding: 0 ;
+
         }
 
         .fi-page {
             display: block ;
         }
+
+        .w-full {
+            width: 100%;
+            height: max-content;
+            max-width: 100%;
+            padding: 0;
+            background: green;
+        }
     </style>
 
-    <div class="w-full h-[calc(100vh-4rem)]">
+    <div class="w-full">
         <iframe
             src="/kasir"
             class="w-full h-full border-0 bg-white"
-        ></iframe>
+            style="height: 1000px; background">
+        </iframe>
     </div>
 
 </x-filament-panels::page>
