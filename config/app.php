@@ -15,6 +15,13 @@ return [
 
     'name' => env('APP_NAME', 'Laravel'),
 
+
+    'cafe_name' => env('CAFE_NAME', 'Cafe Vol Fortuin'),
+    'cafe_address' => env('CAFE_ADDRESS', 'Jl. Ngagel Tama No.75, Baratajaya, Kec. Gubeng, Surabaya, Jawa Timur 60284'),
+    'cafe_phone' => env('CAFE_PHONE', '081323323631'),
+    'cafe_wifi_name' => env('CAFE_WIFI_NAME', 'CafeWifi'),
+    'cafe_wifi_password' => env('CAFE_WIFI_PASSWORD', 'kopihangat123'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Environment

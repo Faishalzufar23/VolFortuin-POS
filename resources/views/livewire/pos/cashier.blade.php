@@ -257,6 +257,9 @@
         </div>
     @endif
 
+@include('livewire.pos.receipt-modal')
+
+
 
 
 </div>

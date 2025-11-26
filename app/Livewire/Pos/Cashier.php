@@ -25,6 +25,11 @@ class Cashier extends Component
     public $notes = '';
     public $customer_name;
     public $customer_phone;
+    public $showReceipt = false;
+    public $lastSale;
+    public $receiptData = null;
+
+
 
 
 
@@ -130,7 +135,8 @@ class Cashier extends Component
             $sale = Sale::create([
                 'invoice_number' => $invoice,
                 'user_id'        => Auth::id(),
-                'customer_id'    => $customer?->id,      // ← FIX PENTING!
+                'customer_id'    => $customer?->id,
+                'customer_phone' => $this->customer_phone,
                 'notes'          => $this->notes,
                 'items_count'    => collect($this->cart)->sum('quantity'),
                 'sub_total'      => $this->subTotal,
@@ -205,6 +211,13 @@ class Cashier extends Component
         }
     }
 
+    public function closeReceipt()
+    {
+        $this->showReceipt = false;
+        $this->lastSale = null;
+    }
+
+
 
 
 
@@ -268,11 +281,32 @@ class Cashier extends Component
     }
 
 
-    public function printReceipt()
+    public function printReceipt($saleId = null)
     {
-        $this->dispatch('notify', message: 'Fitur cetak struk coming soon!');
-        $this->showSuccessModal = false;
+        $sale = Sale::with(['items.product', 'user', 'customer'])
+            ->latest()
+            ->first();
+
+        if (! $sale) {
+            $this->dispatch('notify', message: 'Tidak ada transaksi untuk dicetak.');
+            return;
+        }
+
+        // simpan data transaksi
+        $this->receiptData = $sale;
+
+        // 🔥 Ambil nomor WA dari sale -> customer_phone
+        $this->receiptData->whatsapp = $sale->customer->phone
+            ?? $sale->customer_phone
+            ?? null;
+
+        $this->showReceipt = true;
     }
+
+
+
+
+
 
 
     public function render()

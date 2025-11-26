@@ -21,8 +21,10 @@ class IngredientResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCube;
 
-     protected static UnitEnum|string|null $navigationGroup = 'Gudang';
+    protected static UnitEnum|string|null $navigationGroup = 'Gudang';
     protected static ?string $navigationLabel = 'Bahan Baku';
+    protected static ?string $pluralLabel = 'Bahan Baku';
+    protected static ?string $modelLabel = 'Bahan Baku';
 
     protected static ?string $recordTitleAttribute = 'name';
 

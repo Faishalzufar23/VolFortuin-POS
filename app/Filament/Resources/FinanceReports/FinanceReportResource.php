@@ -22,6 +22,8 @@ class FinanceReportResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'Laporan';
     protected static ?string $navigationLabel = 'Laporan Keuangan';
+    protected static ?string $pluralLabel = 'Laporan Keuangan';
+    protected static ?string $modelLabel = 'Laporan Keuangan';
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBanknotes;
 
 

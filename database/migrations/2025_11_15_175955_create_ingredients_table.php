@@ -6,23 +6,18 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('ingredients', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique()->change();
-            $table->string('unit'); // gram / ml / pcs
-            $table->decimal('stock', 10, 2)->default(0);
+            $table->string('name')->unique();   // ← INI WAJIB ADA
+            $table->decimal('stock', 12, 2)->default(0);
+            $table->string('unit')->nullable(); // gram, ml, pcs
+            $table->decimal('price', 12, 2)->default(0);
             $table->timestamps();
-    });
+        });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('ingredients');

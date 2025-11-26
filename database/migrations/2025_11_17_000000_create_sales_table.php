@@ -25,6 +25,7 @@ return new class extends Migration
             $table->integer('paid_amount')->nullable();
             $table->integer('change_amount')->nullable();
             $table->foreignId('customer_id')->nullable()->constrained()->nullOnDelete();
+            $table->string('customer_phone')->nullable();
             $table->timestamps();
         });
     }

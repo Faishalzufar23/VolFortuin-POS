@@ -32,6 +32,8 @@ class IngredientUsageResource extends Resource
     protected static string|\UnitEnum|null $navigationGroup = 'Gudang';
 
     protected static ?string $navigationLabel = 'Laporan Pemakaian';
+    protected static ?string $pluralLabel = 'Laporan Pemakaian';
+    protected static ?string $modelLabel = 'Laporan Pemakaian';
 
     protected static ?string $recordTitleAttribute = 'ingredient.name';
 
