@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Livewire\Pos\Cashier;
+use App\Models\Sale;
 
 Route::get('/', function () {
     return view('welcome');

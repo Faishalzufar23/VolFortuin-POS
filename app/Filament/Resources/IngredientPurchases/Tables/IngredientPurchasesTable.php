@@ -5,6 +5,8 @@ namespace App\Filament\Resources\IngredientPurchases\Tables;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
+use Filament\Forms\Components\DatePicker;
 
 class IngredientPurchasesTable
 {
@@ -25,12 +27,33 @@ class IngredientPurchasesTable
                     ->label('Satuan')
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->label('Tanggal & Jam')
                     ->dateTime('d M Y - H:i')
                     ->timezone('Asia/Jakarta')
                     ->sortable(),
             ])
+
+            ->filters([
+                Filter::make('tanggal')
+                    ->label('Filter Tanggal')
+                    ->form([
+                        DatePicker::make('from')->label('From'),
+                        DatePicker::make('until')->label('Until'),
+                    ])
+                    ->query(function ($query, array $data) {
+                        return $query
+                            ->when(
+                                $data['from'] ?? null,
+                                fn ($q, $date) => $q->whereDate('created_at', '>=', $date)
+                            )
+                            ->when(
+                                $data['until'] ?? null,
+                                fn ($q, $date) => $q->whereDate('created_at', '<=', $date)
+                            );
+                    }),
+            ])
+
             ->defaultSort('created_at', 'desc');
     }
 }

@@ -31,50 +31,118 @@
     </div>
 
     {{-- KERANJANG --}}
-    <div class="col-span-4 bg-white rounded-lg border shadow p-4 sticky top-4">
-        <h2 class="font-bold text-lg mb-4">Keranjang</h2>
+    <div class="col-span-4">
+        <div class="bg-white rounded-xl border shadow-sm p-5 sticky top-4">
 
-        @forelse ($cart as $id => $item)
-            <div wire:key="cart-{{ $id }}" class="flex justify-between mb-3">
-                <div>
-                    <strong>{{ $item['name'] }}</strong><br>
-                    <small>Rp {{ number_format($item['price']) }}</small>
-                </div>
-                <div class="flex items-center gap-2">
-                    <button wire:click="decrement({{ $id }})" class="px-2 border rounded">-</button>
-
-                    <span class="w-6 text-center">{{ $item['quantity'] }}</span>
-
-                    <button wire:click="increment({{ $id }})" class="px-2 border rounded">+</button>
-
-                    <button wire:click="removeItem({{ $id }})" class="text-red-500">x</button>
-                </div>
-            </div>
-        @empty
-            <p class="text-gray-500 text-sm text-center mt-4">
-                Keranjang masih kosong
+            <h2 class="font-bold text-lg mb-1">Keranjang</h2>
+            <p class="text-sm text-gray-500 mb-4">
+                {{ empty($cart) ? 'Keranjang masih kosong' : 'Daftar pesanan' }}
             </p>
-        @endforelse
 
-        <hr class="my-3">
+            {{-- LIST ITEM --}}
+            <div class="space-y-4 max-h-[260px] overflow-y-auto pr-1">
 
-        <div class="space-y-2 text-sm">
-            <div>Subtotal: <strong>Rp {{ number_format($this->subTotal) }}</strong></div>
-            <div>Pajak (%): <input type="number" wire:model="tax" class="border w-20 p-1 rounded"></div>
-            <div>Diskon (Rp): <input type="number" wire:model="discount" class="border w-20 p-1 rounded"></div>
-            <div class="text-xl mt-3">TOTAL:
-                <strong>Rp {{ number_format($this->total) }}</strong>
+                @forelse ($cart as $id => $item)
+                    <div wire:key="cart-{{ $id }}"
+                        class="flex justify-between items-center border rounded-lg p-3 shadow-sm">
+
+                        <div>
+                            <p class="font-semibold text-gray-800 leading-tight">
+                                {{ $item['name'] }}
+                            </p>
+                            <p class="text-gray-500 text-sm">
+                                Rp {{ number_format($item['price']) }}
+                            </p>
+                        </div>
+
+                        <div class="flex items-center gap-2">
+                            <button wire:click="decrement({{ $id }})"
+                                class="h-7 w-7 flex items-center justify-center border rounded bg-gray-100 hover:bg-gray-200">
+                                –
+                            </button>
+
+                            <span class="w-6 text-center font-semibold">
+                                {{ $item['quantity'] }}
+                            </span>
+
+                            <button wire:click="increment({{ $id }})"
+                                class="h-7 w-7 flex items-center justify-center border rounded bg-gray-100 hover:bg-gray-200">
+                                +
+                            </button>
+
+                            <button wire:click="removeItem({{ $id }})"
+                                class="text-red-500 font-bold text-lg">
+                                ×
+                            </button>
+                        </div>
+                    </div>
+
+                @empty
+                    <p class="text-gray-400 text-sm text-center py-6">
+                        Belum ada item.
+                    </p>
+                @endforelse
+
             </div>
+
+            <hr class="my-4">
+
+            {{-- ADDITIONAL NOTES --}}
+            <div class="mb-4">
+                <label class="text-sm font-semibold text-gray-700">Catatan Tambahan:</label>
+                <textarea wire:model="notes" class="w-full border rounded-lg p-2 text-sm mt-1 focus:ring focus:ring-blue-200"
+                    rows="3" placeholder="Contoh: tanpa gula, level es sedikit, catatan khusus pelanggan..."></textarea>
+            </div>
+
+            {{-- TOTAL SECTION --}}
+            <div class="space-y-3 text-sm">
+
+                <div class="flex justify-between">
+                    <span>Subtotal:</span>
+                    <strong>Rp {{ number_format($this->subTotal) }}</strong>
+                </div>
+
+                <div class="flex justify-between items-center">
+                    <span>Pajak (%):</span>
+                    <input type="number" wire:model="tax" class="border w-24 p-1 rounded text-right">
+                </div>
+
+                <div class="flex justify-between items-center">
+                    <span>Diskon (Rp):</span>
+                    <input type="number" wire:model="discount" class="border w-24 p-1 rounded text-right">
+                </div>
+
+                <div class="flex justify-between items-center">
+                    <span>Nama Customer:</span>
+                    <input type="text" wire:model="customer_name" class="border w-40 p-1 rounded text-right"
+                        placeholder="Opsional">
+                </div>
+
+                <div class="flex justify-between items-center">
+                    <span>No. WhatsApp:</span>
+                    <input type="text" wire:model="customer_phone" class="border w-40 p-1 rounded text-right"
+                        placeholder="Opsional">
+                </div>
+
+
+                <div class="flex justify-between pt-3 text-xl font-bold">
+                    <span>Total:</span>
+                    <span>Rp {{ number_format($this->total) }}</span>
+                </div>
+
+            </div>
+
+            @if (!empty($cart))
+                <button wire:click="$set('showPaymentModal', true)"
+                    class="mt-5 bg-green-600 hover:bg-green-700 text-white w-full py-2 rounded-lg font-semibold transition">
+                    Checkout
+                </button>
+            @endif
+
         </div>
-
-        @if (!empty($cart))
-            <button wire:click="$set('showPaymentModal', true)"
-                class="bg-green-600 text-white px-3 py-2 rounded w-full mt-4">
-                Checkout
-            </button>
-        @endif
-
     </div>
+
+
 
     {{-- MODAL PAYMENT --}}
     @if ($showPaymentModal)
@@ -188,5 +256,7 @@
             </div>
         </div>
     @endif
+
+
 
 </div>

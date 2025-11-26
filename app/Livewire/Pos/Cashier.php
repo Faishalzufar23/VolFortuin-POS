@@ -2,16 +2,17 @@
 
 namespace App\Livewire\Pos;
 
-use Livewire\Component;
-use App\Models\Product;
 use App\Models\Sale;
+use App\Models\Product;
+use Livewire\Component;
+use App\Models\Customer;
 use App\Models\SaleItem;
-use App\Models\ProductIngredient;
 use App\Models\Ingredient;
-use App\Models\IngredientUsage;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use App\Models\IngredientUsage;
+use App\Models\ProductIngredient;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class Cashier extends Component
 {
@@ -20,6 +21,13 @@ class Cashier extends Component
     public $search = '';
     public $tax = 0;
     public $discount = 0;
+    public $customer_id = null;
+    public $notes = '';
+    public $customer_name;
+    public $customer_phone;
+
+
+
 
     public function mount()
     {
@@ -60,6 +68,8 @@ class Cashier extends Component
             $this->cart[$id]['quantity']++;
         }
     }
+
+
 
     public function increment($id)
     {
@@ -103,11 +113,25 @@ class Cashier extends Component
         DB::beginTransaction();
 
         try {
+
             $invoice = 'INV-' . strtoupper(Str::random(8));
 
+            // 1. Buat / update customer berdasarkan nomor HP
+            $customer = null;
+
+            if ($this->customer_name || $this->customer_phone) {
+                $customer = Customer::updateOrCreate(
+                    ['phone' => $this->customer_phone],
+                    ['name' => $this->customer_name ?? 'Guest']
+                );
+            }
+
+            // 2. Simpan sale + customer_id
             $sale = Sale::create([
                 'invoice_number' => $invoice,
                 'user_id'        => Auth::id(),
+                'customer_id'    => $customer?->id,      // ← FIX PENTING!
+                'notes'          => $this->notes,
                 'items_count'    => collect($this->cart)->sum('quantity'),
                 'sub_total'      => $this->subTotal,
                 'tax'            => $this->taxAmount,
@@ -123,19 +147,18 @@ class Cashier extends Component
                     : 0,
             ]);
 
+            // 3. Items & pengurangan stok
             foreach ($this->cart as $item) {
 
-                // 1. Simpan sale item (snapshot name)
-                $saleItem = SaleItem::create([
-                    'sale_id'   => $sale->id,
+                SaleItem::create([
+                    'sale_id' => $sale->id,
                     'product_id' => $item['id'],
-                    'name'      => $item['name'],
-                    'quantity'  => $item['quantity'],
-                    'price'     => $item['price'],
+                    'name' => $item['name'],
+                    'quantity' => $item['quantity'],
+                    'price' => $item['price'],
                     'line_total' => $item['quantity'] * $item['price'],
                 ]);
 
-                // 2. Ambil resep produk
                 $recipes = ProductIngredient::with('ingredient')
                     ->where('product_id', $item['id'])
                     ->get();
@@ -145,50 +168,45 @@ class Cashier extends Component
                     $ingredient = $recipe->ingredient;
 
                     if (!$ingredient) {
-                        throw new \Exception("Bahan baku tidak ditemukan untuk product_ingredient id {$recipe->id}");
+                        throw new \Exception("Bahan baku tidak ditemukan.");
                     }
 
-                    // Hitung pemakaian bahan
-                    $usedQty = $recipe->quantity * $item['quantity'];
+                    $used = $recipe->quantity * $item['quantity'];
 
-                    // Pastikan stok cukup
-                    if ($ingredient->stock < $usedQty) {
-                        throw new \Exception(
-                            "Stok bahan '{$ingredient->name}' kurang. Dibutuhkan {$usedQty} {$ingredient->unit}, tersisa {$ingredient->stock}."
-                        );
+                    if ($ingredient->stock < $used) {
+                        throw new \Exception("Stok {$ingredient->name} kurang.");
                     }
 
-                    // 3. Kurangi stok bahan
-                    $ingredient->decrement('stock', $usedQty);
+                    $ingredient->decrement('stock', $used);
 
-                    // 4. Simpan log pemakaian bahan
                     IngredientUsage::create([
-                        'sale_id'       => $sale->id,
-                        'product_id'    => $item['id'],
+                        'sale_id' => $sale->id,
+                        'product_id' => $item['id'],
                         'ingredient_id' => $ingredient->id,
-                        'quantity_used' => $usedQty,
-                        'unit'          => $ingredient->unit,
+                        'quantity_used' => $used,
+                        'unit' => $ingredient->unit,
                     ]);
                 }
             }
 
             DB::commit();
 
-            // Reset keranjang
+            // Reset
             $this->cart = [];
+            $this->notes = null;
+            $this->customer_name = null;
+            $this->customer_phone = null;
 
             $this->dispatch('notify', message: 'Transaksi berhasil!');
             $this->loadProducts();
         } catch (\Throwable $e) {
             DB::rollBack();
-
-            $this->dispatch('notify', message: 'Gagal checkout: ' . $e->getMessage());
-            logger()->error('Checkout error', [
-                'message' => $e->getMessage(),
-                'trace'   => $e->getTraceAsString(),
-            ]);
+            dd("Checkout ERROR: " . $e->getMessage());
         }
     }
+
+
+
 
     public $showPaymentModal = false;
     public $paymentMethod = 'cash';

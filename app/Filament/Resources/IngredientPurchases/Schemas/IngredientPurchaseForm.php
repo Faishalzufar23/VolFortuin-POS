@@ -23,6 +23,7 @@ class IngredientPurchaseForm
                     $ingredient = Ingredient::find($state);
                     $set('unit', $ingredient?->unit);
                 })
+                ->preload()
                 ->searchable(),
 
             TextInput::make('quantity')

@@ -15,7 +15,8 @@ class IngredientForm
 
             TextInput::make('name')
                 ->label('Nama Bahan')
-                ->required(),
+                ->required()
+                ->unique(ignorable: fn ($record) => $record),
 
             Select::make('unit')
                 ->label('Satuan')

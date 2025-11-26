@@ -17,8 +17,14 @@ class Sale extends Model
         'payment_status',
         'payment_method',
         'paid_amount',
-        'change_amount'
+        'change_amount',
+        'notes'
     ];
+
+    protected $casts = [
+        'is_closed' => 'boolean',
+    ];
+
 
     public function user()
     {
@@ -38,5 +44,10 @@ class Sale extends Model
     public function saleItems()
     {
         return $this->hasMany(SaleItem::class);
+    }
+
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class);
     }
 }

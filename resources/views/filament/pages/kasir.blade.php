@@ -27,7 +27,7 @@
             height: max-content;
             max-width: 100%;
             padding: 0;
-            background: green;
+            background: rgb(255, 255, 255);
         }
     </style>
 

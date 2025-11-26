@@ -11,13 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ingredients', function (Blueprint $table) {
-            $table->id();
-            $table->string('name')->unique()->change();
-            $table->string('unit'); // gram / ml / pcs
-            $table->decimal('stock', 10, 2)->default(0);
-            $table->timestamps();
-    });
+        Schema::table('sales', function (Blueprint $table) {
+            $table->foreignId('customer_id')->nullable()->constrained()->nullOnDelete();
+        });
     }
 
     /**
@@ -25,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('ingredients');
+        Schema::table('sales', function (Blueprint $table) {
+            //
+        });
     }
 };

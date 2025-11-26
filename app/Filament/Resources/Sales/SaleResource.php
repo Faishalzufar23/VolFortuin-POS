@@ -109,7 +109,8 @@ class SaleResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
-            ->with(['items.product', 'user']);
+            ->with(['items.product', 'user'])
+            ->where('is_closed', false);
     }
 
     public static function canCreate(): bool

@@ -14,10 +14,13 @@ class ProductForm
         return $schema->components([
             TextInput::make('name')
                 ->label('Nama Produk')
+                ->unique(ignoreRecord: true)
+                ->maxLength(255)
                 ->required(),
 
             TextInput::make('sku')
                 ->label('SKU')
+                ->unique(ignoreRecord: true)
                 ->required(),
 
             Textarea::make('description')
