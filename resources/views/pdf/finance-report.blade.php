@@ -22,7 +22,7 @@
             <th>Harga Jual</th>
             <th>HPP per Porsi</th>
             <th>Jumlah Terjual</th>
-            <th>Total Penjualan</th>
+            <th>Omzet</th>
             <th>Total HPP</th>
             <th>Laba Kotor</th>
         </tr>
@@ -35,7 +35,7 @@
                 <td class="right">{{ number_format($r['harga_jual']) }}</td>
                 <td class="right">{{ number_format($r['hpp_per_porsi']) }}</td>
                 <td class="right">{{ $r['qty'] }}</td>
-                <td class="right">{{ number_format($r['total_penjualan']) }}</td>
+                <td class="right">{{ number_format($r['total_penjualan']) }}</td> {{-- sekarang: OMZET --}}
                 <td class="right">{{ number_format($r['total_hpp']) }}</td>
                 <td class="right">{{ number_format($r['laba_kotor']) }}</td>
             </tr>
@@ -47,16 +47,25 @@
 
 <table>
     <tr>
-        <td>Total Penjualan</td>
+        <td>Omzet</td>
         <td class="right">{{ number_format($summary['total_penjualan']) }}</td>
     </tr>
+
+    <tr>
+        <td>Total Pajak</td>
+        <td class="right">{{ number_format($summary['total_tax']) }}</td>
+    </tr>
+
     <tr>
         <td>Total HPP</td>
         <td class="right">{{ number_format($summary['total_hpp']) }}</td>
     </tr>
+
     <tr>
         <td><strong>Laba Kotor</strong></td>
-        <td class="right"><strong>{{ number_format($summary['laba_kotor']) }}</strong></td>
+        <td class="right">
+            <strong>{{ number_format($summary['laba_kotor']) }}</strong>
+        </td>
     </tr>
 </table>
 

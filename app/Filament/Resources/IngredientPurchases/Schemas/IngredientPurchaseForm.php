@@ -35,8 +35,14 @@ class IngredientPurchaseForm
                 ->label('Satuan')
                 ->disabled(),
 
+            TextInput::make('total_cost')
+                ->label('Total Harga Pembelian')
+                ->numeric()
+                ->required(),
+
+
             Hidden::make('created_at')
-                ->default(fn () => Carbon::now()),
+                ->default(fn() => Carbon::now()),
 
         ]);
     }

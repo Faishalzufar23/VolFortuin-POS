@@ -27,11 +27,11 @@ class IngredientForm
                 ])
                 ->required(),
 
-            TextInput::make('price_per_unit')
-                ->label('Harga per Unit (per gram / ml / pcs)')
-                ->numeric()
-                ->required()
-                ->prefix('Rp'),
+            TextInput::make('stock')
+                ->label('Stok (otomatis)')
+                ->disabled()
+                ->default(0)
+                ->numeric(),
 
 
         ]);
