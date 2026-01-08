@@ -34,11 +34,7 @@ class Cashier extends Component
     protected $testing = false;
 
 
-
-
-
-
-//testing tidak meload
+    //testing tidak meload
     public function mount()
     {
         if (!app()->environment('testing')) {
@@ -50,14 +46,23 @@ class Cashier extends Component
 
     public function loadProducts()
     {
-        $query = Product::with('productIngredients.ingredient');
+        $query = Product::query();
 
         if (!empty($this->search)) {
-            $query->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($this->search) . '%']);
+            $query->where('name', 'like', '%' . $this->search . '%');
         }
 
-        $this->products = $query->get()->toArray();
+        $this->products = $query->select(
+            'id',
+            'name',
+            'price',
+            'stock',
+            'image'
+        )
+            ->get()
+            ->toArray();
     }
+
 
 
 

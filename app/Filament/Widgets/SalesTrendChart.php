@@ -8,7 +8,6 @@ use Illuminate\Support\Carbon;
 
 class SalesTrendChart extends ChartWidget
 {
-    // NOTE: parent defines $heading as non-static in your Filament version
     protected ?string $heading = 'Sales Trend (Last 30 Days)';
 
     protected function getType(): string
@@ -18,22 +17,26 @@ class SalesTrendChart extends ChartWidget
 
     protected function getData(): array
     {
-        // ambil per-hari selama 30 hari terakhir
-        $from = now()->subDays(30)->startOfDay();
+        $from = Carbon::now()->subDays(29)->startOfDay();
+        $to   = Carbon::now()->endOfDay();
+
         $rows = Sale::selectRaw('DATE(created_at) as date, SUM(total) as total')
-            ->where('created_at', '>=', $from)
+            ->whereBetween('created_at', [$from, $to])
             ->groupBy('date')
             ->orderBy('date')
             ->get()
             ->keyBy('date');
 
-        // buat label untuk 30 hari agar chart selalu konsisten (jika hari kosong -> 0)
         $labels = [];
         $values = [];
-        for ($d = 0; $d < 30; $d++) {
-            $date = Carbon::today()->subDays(29 - $d)->toDateString();
-            $labels[] = date('M d', strtotime($date));
-            $values[] = isset($rows[$date]) ? (float) $rows[$date]->total : 0.0;
+
+        for ($i = 0; $i < 30; $i++) {
+            $date = Carbon::today()->subDays(29 - $i)->toDateString();
+
+            $labels[] = Carbon::parse($date)->format('M d');
+            $values[] = isset($rows[$date])
+                ? (float) $rows[$date]->total
+                : 0;
         }
 
         return [
@@ -42,6 +45,10 @@ class SalesTrendChart extends ChartWidget
                 [
                     'label' => 'Sales',
                     'data' => $values,
+                    'borderColor' => '#f59e0b',
+                    'backgroundColor' => 'rgba(245, 158, 11, 0.25)',
+                    'fill' => true,
+                    'tension' => 0.4,
                 ],
             ],
         ];

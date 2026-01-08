@@ -11,6 +11,7 @@ class Product extends Model
         'sku',
         'description',
         'price',
+        'image', // ✅ WAJIB DITAMBAHKAN
     ];
 
     public function saleItems()
@@ -80,5 +81,10 @@ class Product extends Model
         }
 
         return $min ?? 0;
+    }
+
+    public function getHasImageAttribute(): bool
+    {
+        return ! empty($this->image);
     }
 }

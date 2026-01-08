@@ -2,18 +2,19 @@
 
 namespace App\Filament\Resources\Products\RelationManagers;
 
-use App\Models\Ingredient;
 use Filament\Forms;
-use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Schemas\Schema;
 use Filament\Tables;
+use App\Models\Ingredient;
 use Filament\Tables\Table;
+use Filament\Actions\Action;
+use Filament\Schemas\Schema;
 
 // ⚡ ACTIONS YANG BENAR UNTUK FILAMENT 4.2
-use Filament\Actions\Action;
 use Filament\Actions\EditAction;
-use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Resources\RelationManagers\RelationManager;
 
 class ProductIngredientsRelationManager extends RelationManager
 {
@@ -89,6 +90,7 @@ class ProductIngredientsRelationManager extends RelationManager
             // ⚡ EDIT
             ->recordActions([
                 EditAction::make(),
+                DeleteAction::make(),
             ])
 
             // ⚡ BULK DELETE

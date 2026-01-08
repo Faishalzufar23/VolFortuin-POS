@@ -1,34 +1,48 @@
 <div class="grid grid-cols-12 gap-6">
-
     {{-- PRODUK --}}
     <div class="col-span-8">
-        <input type="text" wire:model.live="search" class="w-full border rounded p-2 mb-4" placeholder="Cari produk...">
+        <input type="text" wire:model.live="search" class="w-full border rounded-lg p-2 mb-4"
+            placeholder="Cari produk...">
 
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             @forelse ($products as $p)
-                <div class="p-4 border rounded-lg shadow hover:shadow-md transition">
+                <div
+                    class="bg-white p-4 border rounded-xl shadow-sm hover:shadow-lg transition text-center flex flex-col">
 
-                    @if (!empty($p['photo']))
-                        <img src="{{ asset('storage/products/' . $p['photo']) }}" class="w-20 h-20 object-cover rounded">
-                    @endif
+                    {{-- FOTO PRODUK --}}
+                    <div class="w-full h-44 mb-3 rounded-lg overflow-hidden bg-gray-100">
+                        @if (!empty($p['image']))
+                            <img src="{{ asset('storage/' . $p['image']) }}" class="w-full h-full object-cover"
+                                loading="lazy" alt="{{ $p['name'] }}">
+                        @else
+                            <div class="w-full h-full flex items-center justify-center text-gray-400 text-sm">
+                                No Image
+                            </div>
+                        @endif
+                    </div>
 
+                    {{-- NAMA --}}
+                    <h3 class="font-semibold text-sm leading-tight">
+                        {{ $p['name'] }}
+                    </h3>
 
-                    <h3 class="font-semibold">{{ $p['name'] }}</h3>
-                    <p>Rp {{ number_format($p['price']) }}</p>
+                    {{-- HARGA --}}
+                    <p class="text-green-600 text-sm mt-1">
+                        Rp {{ number_format($p['price']) }}
+                    </p>
 
                     @php
                         $disabled = ($p['stock'] ?? 0) <= 0;
                     @endphp
 
+                    {{-- BUTTON --}}
                     <button wire:click="addToCart({{ $p['id'] }})"
-                        class="mt-3 px-3 py-1 rounded text-white
-        {{ $disabled ? 'bg-red-500 opacity-60 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700' }}"
+                        class="mt-auto w-full px-3 py-2 rounded-lg text-white text-sm font-medium
+                        {{ $disabled ? 'bg-red-500 opacity-60 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 active:scale-95' }}"
                         {{ $disabled ? 'disabled' : '' }}>
                         {{ $disabled ? 'Stok Habis' : 'Tambah' }}
                     </button>
-
                 </div>
-
             @empty
                 <p class="col-span-4 text-gray-500 text-center">
                     Produk tidak ditemukan
@@ -36,6 +50,8 @@
             @endforelse
         </div>
     </div>
+
+
 
     {{-- KERANJANG --}}
     <div class="col-span-4">
