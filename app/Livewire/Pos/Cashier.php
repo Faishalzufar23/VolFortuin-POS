@@ -15,6 +15,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Storage;
+use App\Services\MidtransService;
+
+
 
 
 class Cashier extends Component
@@ -32,12 +35,18 @@ class Cashier extends Component
     public $lastSale;
     public $receiptData = null;
     protected $testing = false;
+    public $categoryId = null;
+    public $categories = [];
+
+
+
 
 
     //testing tidak meload
     public function mount()
     {
         if (!app()->environment('testing')) {
+            $this->categories = \App\Models\Category::orderBy('name')->get();
             $this->loadProducts();
         }
     }
@@ -46,7 +55,10 @@ class Cashier extends Component
 
     public function loadProducts()
     {
-        $query = Product::query();
+        $query = Product::query()
+            ->when($this->categoryId, function ($q) {
+                $q->where('category_id', $this->categoryId);
+            });
 
         if (!empty($this->search)) {
             $query->where('name', 'like', '%' . $this->search . '%');
@@ -68,6 +80,12 @@ class Cashier extends Component
 
     public function updatedSearch()
     {
+        $this->loadProducts();
+    }
+
+    public function setCategory($categoryId = null)
+    {
+        $this->categoryId = $categoryId;
         $this->loadProducts();
     }
 
@@ -307,6 +325,7 @@ class Cashier extends Component
         $this->showPaymentModal = false;
         $this->stepPayment = 1;
     }
+
 
     public $receiptPdfUrl = null;
     public function printReceipt($saleId = null)

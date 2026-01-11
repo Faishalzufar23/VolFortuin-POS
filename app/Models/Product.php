@@ -7,11 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 class Product extends Model
 {
     protected $fillable = [
+        'category_id',
         'name',
         'sku',
         'description',
         'price',
-        'image', // ✅ WAJIB DITAMBAHKAN
+        'image',
     ];
 
     public function saleItems()
@@ -86,5 +87,10 @@ class Product extends Model
     public function getHasImageAttribute(): bool
     {
         return ! empty($this->image);
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
     }
 }

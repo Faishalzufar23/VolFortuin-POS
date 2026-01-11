@@ -7,6 +7,7 @@ use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\Layout\Stack;
+use Filament\Tables\Filters\SelectFilter;
 
 class ProductsTable
 {
@@ -29,15 +30,21 @@ class ProductsTable
                             'class' => 'object-cover rounded-xl',
                         ])
                         ->getStateUsing(
-                            fn($record) =>
-                            $record->image
-                                ? asset('storage/' . $record->image)
-                                : asset('images/no-image.png')
+                            fn ($record) =>
+                                $record->image
+                                    ? asset('storage/' . $record->image)
+                                    : asset('images/no-image.png')
                         ),
 
                     TextColumn::make('name')
                         ->weight('bold')
                         ->size('lg')
+                        ->alignCenter(),
+
+                    // ✅ TAMBAHAN: CATEGORY BADGE
+                    TextColumn::make('category.name')
+                        ->badge()
+                        ->color('info')
                         ->alignCenter(),
 
                     TextColumn::make('description')
@@ -54,13 +61,23 @@ class ProductsTable
                     TextColumn::make('stock')
                         ->badge()
                         ->alignCenter()
-                        ->color(fn($state) => $state > 0 ? 'success' : 'danger')
+                        ->color(fn ($state) => $state > 0 ? 'success' : 'danger')
                         ->formatStateUsing(
-                            fn($state) =>
-                            $state > 0 ? "Stok: $state" : 'Stok Habis'
+                            fn ($state) =>
+                                $state > 0 ? "Stok: $state" : 'Stok Habis'
                         ),
                 ])->space(2),
             ])
+
+            // ✅ INI INTI FILTER CATEGORY
+            ->filters([
+                SelectFilter::make('category_id')
+                    ->label('Category')
+                    ->relationship('category', 'name')
+                    ->searchable()
+                    ->preload(),
+            ])
+
             ->actions([
                 EditAction::make()
                     ->label('Edit')

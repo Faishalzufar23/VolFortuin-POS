@@ -3,17 +3,26 @@
 namespace App\Filament\Resources\Products\Schemas;
 
 use Filament\Schemas\Schema;
-use Filament\Forms\Components\TextInput;
+use Illuminate\Support\HtmlString;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Placeholder;
-use Illuminate\Support\HtmlString;
 
 class ProductForm
 {
     public static function configure(Schema $schema): Schema
     {
         return $schema->components([
+
+            Select::make('category_id')
+                ->label('Category')
+                ->relationship('category', 'name')
+                ->required()
+                ->searchable()
+                ->preload(),
+
 
             TextInput::make('name')
                 ->label('Nama Produk')
@@ -40,14 +49,15 @@ class ProductForm
              ========================= */
             Placeholder::make('image_preview')
                 ->label('Foto Saat Ini')
-                ->content(fn ($record) => $record && $record->image
-                    ? new HtmlString(
-                        '<img
+                ->content(
+                    fn($record) => $record && $record->image
+                        ? new HtmlString(
+                            '<img
                             src="' . asset('storage/' . $record->image) . '"
                             class="w-32 h-32 object-cover rounded-lg border shadow"
                         >'
-                    )
-                    : new HtmlString('<span class="text-gray-500">Belum ada foto</span>')
+                        )
+                        : new HtmlString('<span class="text-gray-500">Belum ada foto</span>')
                 ),
 
             /* =========================
@@ -63,7 +73,7 @@ class ProductForm
                 ->maxSize(2048)
 
                 // 🔥 INI KUNCI UTAMA
-                ->dehydrated(fn ($state) => filled($state))
+                ->dehydrated(fn($state) => filled($state))
                 ->previewable(false) // ⛔ tidak tampil preview besar
                 ->helperText('Klik tombol untuk memilih gambar baru'),
         ]);

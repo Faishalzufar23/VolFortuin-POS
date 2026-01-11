@@ -4,6 +4,24 @@
         <input type="text" wire:model.live="search" class="w-full border rounded-lg p-2 mb-4"
             placeholder="Cari produk...">
 
+        {{-- FILTER KATEGORI --}}
+        <div class="flex gap-2 mb-5 flex-wrap">
+            <button wire:click="setCategory"
+                class="px-4 py-2 rounded-lg text-sm font-medium transition
+        {{ $categoryId === null ? 'bg-blue-600 text-white' : 'bg-gray-100 hover:bg-gray-200' }}">
+                Semua
+            </button>
+
+            @foreach ($categories as $category)
+                <button wire:click="setCategory({{ $category->id }})"
+                    class="px-4 py-2 rounded-lg text-sm font-medium transition
+            {{ $categoryId === $category->id ? 'bg-blue-600 text-white' : 'bg-gray-100 hover:bg-gray-200' }}">
+                    {{ $category->name }}
+                </button>
+            @endforeach
+        </div>
+
+
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             @forelse ($products as $p)
                 <div
@@ -218,12 +236,21 @@
 
                 {{-- Step 3 QRIS --}}
                 @if ($stepPayment === 3)
-                    <h2 class="text-lg font-bold mb-4 text-center">Scan QRIS</h2>
+                    <h2 class="text-lg font-bold mb-4 text-center">Scan QRIS BCA</h2>
 
                     <div class="text-center">
-                        <img src="/images/qris-example.png" class="w-52 mx-auto border rounded">
-                        <p class="mt-3">Total:
-                            <strong>Rp {{ number_format($this->total) }}</strong>
+                        <img src="{{ asset('images/qris-bca.png') }}" class="w-56 mx-auto border rounded-lg shadow"
+                            alt="QRIS BCA">
+
+                        <p class="mt-3 text-sm text-gray-600">
+                            Silakan scan QRIS untuk melakukan pembayaran
+                        </p>
+
+                        <p class="mt-2 font-semibold">
+                            Total:
+                            <span class="text-green-600">
+                                Rp {{ number_format($this->total) }}
+                            </span>
                         </p>
                     </div>
 
@@ -238,6 +265,7 @@
                         </button>
                     </div>
                 @endif
+
 
             </div>
         </div>
