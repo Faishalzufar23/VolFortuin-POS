@@ -203,6 +203,12 @@
                             class="p-4 border rounded-lg text-center bg-gray-100 hover:bg-blue-200">
                             📱 QRIS
                         </button>
+
+                        <button wire:click="startEtcPayment"
+                            class="p-4 border rounded-lg text-center bg-gray-100 hover:bg-purple-200">
+                            💳 ETC
+                        </button>
+
                     </div>
                 @endif
 
@@ -270,6 +276,33 @@
             </div>
         </div>
     @endif
+
+    @if ($showWaitingModal)
+        <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div class="bg-white rounded-lg p-6 w-96 text-center">
+                <h2 class="text-lg font-semibold mb-2">
+                    Menunggu Konfirmasi Pembayaran
+                </h2>
+
+                <p class="text-gray-600 mb-4">
+                    Total: <b>Rp {{ number_format($this->total) }}</b>
+                </p>
+
+
+                <div class="flex justify-center gap-3">
+                    <button wire:click="$set('showWaitingModal', false)"
+                        class="px-4 py-2 bg-gray-500 text-white rounded">
+                        Batal
+                    </button>
+
+                    <button wire:click="confirmEtcPayment" class="px-4 py-2 bg-green-600 text-white rounded">
+                        Oke / Selesaikan
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
+
 
     {{-- MODAL SUCCESS --}}
     @if ($showSuccessModal)

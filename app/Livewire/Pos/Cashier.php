@@ -37,6 +37,8 @@ class Cashier extends Component
     protected $testing = false;
     public $categoryId = null;
     public $categories = [];
+    public bool $showWaitingModal = false;
+
 
 
 
@@ -325,6 +327,33 @@ class Cashier extends Component
         $this->showPaymentModal = false;
         $this->stepPayment = 1;
     }
+
+    public function startEtcPayment()
+    {
+        $this->paymentMethod = 'etc';
+        $this->showPaymentModal = false;
+        $this->showWaitingModal = true;
+    }
+
+    public function confirmEtcPayment()
+    {
+        // 1. simpan metode
+        $this->paymentMethod = 'etc';
+
+        // 2. proses checkout (INI YANG PENTING)
+        $this->checkout();
+
+        // 3. tampilkan modal sukses
+        $this->successMessage = 'Pembayaran ETC Berhasil!';
+        $this->successChange = null;
+        $this->showSuccessModal = true;
+
+        // 4. tutup modal ETC
+        $this->showWaitingModal = false;
+        $this->showPaymentModal = false;
+        $this->stepPayment = 1;
+    }
+
 
 
     public $receiptPdfUrl = null;
